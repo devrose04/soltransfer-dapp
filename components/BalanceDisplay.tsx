@@ -4,33 +4,34 @@ import { FC, useEffect, useState } from 'react';
 
 
 export const BalanceDisplay: FC = () => {
-    const [Balance, setBalance] = useState(0);
+    const [balance, setBalance] = useState(0);
     const { connection } = useConnection();
-    const { publickey } = useWallet();
+    const { publicKey } = useWallet(); // Corrected to publicKey
 
     useEffect(() => {
-        if (!connection || !publickey) {
-            return 
+        if (!connection || !publicKey) {
+            return;
         }
 
         // Ensure the balance updates after the transaction completes
         connection.onAccountChange(
-            publickey,
+            publicKey,
             (updatedAccountInfo) => {
-                setBalance(updatedAccountInfo.lamports / LAMPORTS_PER_SOL)
+                setBalance(updatedAccountInfo.lamports / LAMPORTS_PER_SOL);
             },
             "confirmed",
         );
 
-        connection.getAccountInfo(publickey).then((info) => {
-            setBalance(info.lamports);
+        connection.getAccountInfo(publicKey).then((info) => {
+            if (info) {
+                setBalance(info.lamports / LAMPORTS_PER_SOL);
+            }
         });
-    }, [connection, publickey]);
+    }, [connection, publicKey]);
 
     return (
-        <p>{publickey ? `Balance: ${Balance / LAMPORTS_PER_SOL} SOL`: ""}</p>
-    )
-
+        <p>{publicKey ? `Balance: ${balance} SOL` : ""}</p>
+    );
 }
 
 export default BalanceDisplay;

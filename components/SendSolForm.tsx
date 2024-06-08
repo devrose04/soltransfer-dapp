@@ -3,41 +3,43 @@ import * as web3 from '@solana/web3.js'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { FC, useState } from 'react'
 
-
-const SendSolForm = () => {
-    const [txSig, setTxSig] = useState('')
+const SendSolForm: FC = () => {
+    const [txSig, setTxSig] = useState('');
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
     const link = () => {
-        return txSig ? `https://explorer.solana.com/tx/${txSig}?cluster=devnet` : ''
+        return txSig ? `https://explorer.solana.com/tx/${txSig}?cluster=devnet` : '';
     }
 
     const sendSol = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!connection || !publicKey) {
-            return 
+            return;
         }
 
+        const form = event.target as HTMLFormElement;
+        const recipientPubKey = new web3.PublicKey(form.recipient.value);
+        const amount = parseFloat(form.amount.value) * LAMPORTS_PER_SOL;
+
         const transaction = new web3.Transaction();
-        const recipientPubKey = new web3.PublicKey(event.target.recipient.value)
 
         const sendSolInstruction = web3.SystemProgram.transfer({
             fromPubkey: publicKey,
             toPubkey: recipientPubKey,
-            lamports: LAMPORTS_PER_SOL * event.target.amount.value
-        })
+            lamports: amount,
+        });
 
-        transaction.add(sendSolInstruction)
+        transaction.add(sendSolInstruction);
         sendTransaction(transaction, connection).then((sig) => {
-            setTxSig(sig)
-        })
+            setTxSig(sig);
+        });
     }
 
     return (
         <div className='bg-[]'>
             <div>
                 {
-                    publicKey ? 
+                    publicKey ?
                     <form onSubmit={sendSol} className='flex flex-col justify-center items-center mt-24 mx-auto max-w-md'>
                         <div className="mb-6">
                             <label htmlFor="amount" className='block mb-2 text-lg font-medium text-gray-800'>Amount (in SOL) to Send:</label>
@@ -52,10 +54,10 @@ const SendSolForm = () => {
                         <button type="submit" className='bg-black text-white px-4 py-2 rounded-lg hover:bg-[#512da8] transition duration-300 ease-in-out'>Send</button>
                     </form>
 
-                            :
-                            <div className='flex justify-center items-center text-gray-800 font-bold text-xl mt-60 mr-20'>
-                                <p>Connect Your Wallet</p>
-                            </div>
+                    :
+                    <div className='flex justify-center items-center text-gray-800 font-bold text-xl mt-60 mr-20'>
+                        <p>Connect Your Wallet</p>
+                    </div>
                 }
                 {
                     txSig ?
@@ -67,9 +69,7 @@ const SendSolForm = () => {
                 }
             </div>
         </div>
-        
-    )
-    
+    );
 }
 
-export default SendSolForm
+export default SendSolForm;

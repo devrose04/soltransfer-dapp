@@ -8,7 +8,7 @@ const NavBar: FC = () => {
         <div className="bg-black text-white font-normal flex justify-center items-center py-4">
             <div className="flex items-center">
                 <div className="mr-auto">
-                    <Image src="/solanaLogo.png" height={30} width={200} />
+                    <Image src="/solanaLogo.png" height={30} width={200} alt=""/>
                 </div>
                 <div className="ml-80 font-bold text-white text-3xl text-center">
                     <span className="">SolTransfer</span>
